@@ -16,3 +16,9 @@
 package-lock.json
 /documentation
     
+
+public/bundle.js
+public/bundle.js.map
+public/styles.css
+public/styles.css.map
+
