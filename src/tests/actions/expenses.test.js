@@ -1,4 +1,4 @@
-import { addExpense, removeExpense, editExpense, startAddExpense, setExpenses, startSetExpenses, startRemoveExpense } from "../../actions/expenses";
+import { addExpense, removeExpense, editExpense, startAddExpense, setExpenses, startSetExpenses, startRemoveExpense, startEditExpense } from "../../actions/expenses";
 import expenses from '../fixtures/expenses';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -39,7 +39,6 @@ test('should remove expense from firebase', (done) => {
 });
 
 test('should setup edit expense action object', () => {
-
     const action = editExpense('123abc', { note: 'new note value'})
     expect(action).toEqual({
         type: 'EDIT_EXPENSE', 
@@ -47,6 +46,26 @@ test('should setup edit expense action object', () => {
         updates: {note: 'new note value'}
     });
 
+});
+
+test('should edit expense from firebase', (done) => {
+    const store = createMockStore({});
+    const id = expenses[2].id;
+    const updates = {
+        description: 'new desc after editing',
+    }
+    store.dispatch(startEditExpense(id, updates)).then(() => {
+        const actions = store.getActions();
+        expect(actions[0]).toEqual({
+            type: 'EDIT_EXPENSE',
+            id,
+            updates
+        });
+        return database.ref(`expenses/${id}`).once('value');
+    }).then((snapshot) => {
+        expect(snapshot.val().description).toEqual(updates.description);
+        done();
+    });
 });
 
 test('should setup add expense action object with provided values', () => {
